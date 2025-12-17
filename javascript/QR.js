@@ -38,7 +38,7 @@
       b.push((s[i] & 15) << 4);
     }
     for (i = 0; b.length < _len[v]; i++) b.push((i & 1) ? 17 : 236);
-console.log(b.map(n => n.toString(16)).join(' '));
+// console.log(b.map(n => n.toString(16)).join(' '));
     var dots = _dots(v);
     _static(dots, v);
     return dots;
