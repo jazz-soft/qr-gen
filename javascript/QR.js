@@ -38,10 +38,11 @@
       b.push((s[i] & 15) << 4);
     }
     for (i = 0; b.length < _len[v]; i++) b.push((i & 1) ? 17 : 236);
-// console.log(b.map(n => n.toString(16)).join(' '));
-    var dots = _dots(v);
-    _static(dots, v);
-    return dots;
+    var d = _dots(v);
+    var r = _res(v);
+    _static(d, v);
+    // _mask(d, r, 7);
+    return d;
   };
   function _eyes(v) {
     var e = [];
@@ -78,9 +79,54 @@
       }
     }
   }
+  function _res(v) {
+    var i, j, k, m, sz = v * 4 + 17, e = _eyes(v);
+    var r = _dots(v);
+    for (i = 0; i < 9; i++) {
+      for (j = 0; j < 9; j++) {
+        r[i][j] = 1;
+        if (j) {
+          r[i][sz - j] = 1;
+          r[sz - j][i] = 1;
+        }
+      }
+    }
+    for (i = 8; i < sz - 8; i++) {
+      r[i][6] = 1;
+      r[6][i] = 1;
+    }
+    for (k = 0; k < e.length; k++) for (m = 0; m < e.length; m++) {
+      for (i = 0; i < 5; i++) for (j = 0; j < 5; j++) {
+        if (!k && !m) continue;
+        if (!k && m == e.length - 1) continue;
+        if (!m && k == e.length - 1) continue;
+        r[e[k] + i - 2][e[m] + j - 2] = 1;
+      }
+    }
+    return r;
+  }
+  function _mask(d, r, m) {
+    var i, j, k;
+    for (i = 0; i < d.length; i++) for (j = 0; j < d.length; j++) {
+      if (r[i][j]) continue;
+      k = !m ? k = (i + j) % 2 :
+        m == 1 ? j % 2 :
+        m == 2 ? i % 3 :
+        m == 3 ? (i + j) % 3 :
+        m == 4 ? (Math.floor(i / 3) + Math.floor(j / 2)) % 2 :
+        m == 5 ? i * j % 2 + i * j % 3 :
+        m == 6 ? (i * j % 2 + i * j % 3) % 2 : ((i + j) % 2 + i * j % 3) % 2;
+      if (!k) d[i][j] = 1 - d[i][j];
+    }
+  }
   function _dots(v) {
     var i, d = [], sz = v * 4 + 17;
     for (i = 0; i < sz; i++) d.push(Array(sz).fill(0));
+    return d;
+  }
+  function _dup(x) {
+    var i, d = [];
+    for (i = 0; i < x.length; i++) d.push(x[i].slice());
     return d;
   }
   return QR;
