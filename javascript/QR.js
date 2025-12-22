@@ -17,14 +17,12 @@
     [1, 0, 1, 1, 1, 0, 1, 0], [1, 0, 0, 0, 0, 0, 1, 0], [1, 1, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0]
   ];
   var _eye = [[1, 1, 1, 1, 1], [1, 0, 0, 0, 1], [1, 0, 1, 0, 1], [1, 0, 0, 0, 1], [1, 1, 1, 1, 1]];
-  var _len = [
-    0, 19, 34, 55, 80, 108, 136, 156, 194, 232, 274, 324, 370, 428, 461, 523, 589, 647, 721, 795, 861,
-    932, 1006, 1094, 1174, 1276, 1370, 1468, 1531, 1631, 1735, 1843, 1955, 2071, 2191, 2306, 2434, 2566, 2702, 2812, 2956
-  ];
+  var _ccbl = [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4, 4, 6, 6, 6, 6, 7, 8, 8, 9, 9, 10, 12, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 20, 21, 22, 24, 25];
+  var _ccsz = [0, 7, 10, 15, 20, 26, 18, 20, 24, 30, 18, 20, 24, 26, 30, 22, 24, 28, 30, 28, 28, 28, 28, 30, 30, 26, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30];
   var QR = function(s) {
     s = new TextEncoder().encode(s);
     var i, v;
-    for (v = 1; v <= 40; v++) if (s.length + (v < 10 ? 2 : 3) <= _len[v]) break;
+    for (v = 1; v <= 40; v++) if (s.length + (v < 10 ? 2 : 3) <= _len(v)) break;
     if (v > 40) throw "Input string is too long!";
     var b = [0x40];
     if (v >= 10) {
@@ -37,13 +35,29 @@
       b[b.length - 1] += (s[i] >> 4);
       b.push((s[i] & 15) << 4);
     }
-    for (i = 0; b.length < _len[v]; i++) b.push((i & 1) ? 17 : 236);
+    for (i = 0; b.length < _len(v); i++) b.push((i & 1) ? 17 : 236);
+    var raw = _raw(v);
+    var nbl = _ccbl[v] - raw % _ccbl[v];
+    var sbl = Math.floor(raw / _ccbl[v]);
+
     var d = _dots(v);
     var r = _res(v);
     _static(d, v);
     // _mask(d, r, 7);
     return d;
   };
+  function _raw(v) {
+    var n, x = (16 * v + 128) * v + 64;
+    if (v > 1) {
+      n = Math.floor(v / 7) + 2;
+      x -= (25 * n - 10) * n - 55;
+      if (v >= 7) x -= 36;
+    }
+    return Math.floor(x / 8);
+  }
+  function _len(v) {
+    return _raw(v) -  _ccbl[v] * _ccsz[v];
+  }
   function _eyes(v) {
     var e = [];
     if (v < 2) return e;
