@@ -21,7 +21,7 @@
   var _ccsz = [0, 7, 10, 15, 20, 26, 18, 20, 24, 30, 18, 20, 24, 26, 30, 22, 24, 28, 30, 28, 28, 28, 28, 30, 30, 26, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30];
   var QR = function(s) {
     s = new TextEncoder().encode(s);
-    var i, k, v;
+    var i, j, k, v;
     for (v = 1; v <= 40; v++) if (s.length + (v < 10 ? 2 : 3) <= _len(v)) break;
     if (v > 40) throw "Input string is too long!";
     var b = [0x40];
@@ -37,10 +37,24 @@
     }
     for (i = 0; b.length < _len(v); i++) b.push((i & 1) ? 17 : 236);
     var raw = _raw(v);
-    var nbl = _ccbl[v] - raw % _ccbl[v];
+    var nsb = _ccbl[v] - raw % _ccbl[v];
     var sbl = Math.floor(raw / _ccbl[v]);
     var rsd = _rsd(_ccsz[v]);
-// console.log('RSD:', rsd);
+    k = 0;
+    var bbb = [];
+    for (i = 0; i < nsb; i++) {
+      var dat = b.slice(k, k + sbl - _ccsz[v] + (i < sbl ? 0 : 1));
+      var ecc = _rcr(dat, rsd);
+      k += dat.length;
+      if (i < nsb) dat.push(0);
+      bbb.push(dat.concat(ecc));
+    }
+    b = [];
+    for (i = 0; i < bbb[0].length; i++) {
+      for (j = 0; j < bbb.length; j++) {
+        if (i != sbl - _ccsz[v] || j >= nsb) b.push(bbb[j][i]);
+      }
+    }
     var d = _dots(v);
     var r = _res(v);
     _static(d, v);
@@ -166,12 +180,11 @@
     return z;
   }
   function _rcr(x, d) {
-    var a = Array(d.length).fill(0);
-    for (var b of x) {
-      var f = b ^ a.shift();
+    var i, j, f, a = Array(d.length).fill(0);
+    for (i = 0; i < x.length; i++) {
+      f = x[i] ^ a.shift();
       a.push(0);
-      d.forEach((coef, i) =>
-        a[i] ^= QrCode.reedSolomonMultiply(coef, factor));
+      for (j = 0; j < d.length; j++) a[j] ^= _rsm(d[j], f);
     }
     return a;
   }
