@@ -4,13 +4,20 @@
   "description": "Minimal implementation to generate a QR code from a UTF-8 string",
   "main": "javascript/qr-min.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint javascript"
   },
   "keywords": [
     "qr",
     "qr-code"
   ],
   "author": "jazz-soft (https://jazz-soft.net/)",
+  "devDependencies": {
+    "eslint": "^9.39.1",
+    "grunt": "^1.6.1",
+    "grunt-contrib-jshint": "^3.2.0",
+    "grunt-contrib-uglify": "^5.2.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jazz-soft/qr-min.git"
