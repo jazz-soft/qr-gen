@@ -8,7 +8,7 @@
   }
   else {
     if (!global) global = window;
-    if (global.QR && global.QR.MIDI) return;
+    if (global.QR) return;
     global.QR = factory();
   }
 })(this, function() {
@@ -65,9 +65,17 @@
         for (_nxt(p, d.length); r[p[0]][p[1]]; _nxt(p, d.length)) ;
       }
     }
-    _format(d, 0, 0);
-    _mask(d, r, 0);
-    return d;
+    for (i = 0; i < 8; i++) {
+      b = _dup(d);
+      _format(b, 0, i);
+      _mask(b, r, i);
+      j = _score(b);
+      if (!i || j < k) {
+        k = j;
+        bbb = b;
+      }
+    }
+    return bbb;
   };
   function _nxt(p, sz) {
     var d = (p[1] > 5 ? p[1] - 1 : p[1]) % 4;
@@ -180,14 +188,69 @@
     for (i = 0; i < d.length; i++) for (j = 0; j < d.length; j++) {
       if (r[i][j]) continue;
       k = !m ? k = (i + j) % 2 :
-        m == 1 ? j % 2 :
-        m == 2 ? i % 3 :
+        m == 1 ? i % 2 :
+        m == 2 ? j % 3 :
         m == 3 ? (i + j) % 3 :
-        m == 4 ? (Math.floor(i / 3) + Math.floor(j / 2)) % 2 :
+        m == 4 ? (Math.floor(j / 3) + Math.floor(i / 2)) % 2 :
         m == 5 ? i * j % 2 + i * j % 3 :
         m == 6 ? (i * j % 2 + i * j % 3) % 2 : ((i + j) % 2 + i * j % 3) % 2;
       if (!k) d[i][j] = 1 - d[i][j];
     }
+  }
+  function _score(d) {
+    var i, j, k, n, x;
+    k = 0;
+    for (i = 0; i < d.length; i++) for (j = 0; j < d.length; j++) k += d[i][j];
+    n = d.length * d.length;
+    x = Math.floor(Math.abs(n - 2 * k) / n * 10) * 10;
+    for (i = 0; i < d.length - 1; i++) for (j = 0; j < d.length - 1; j++) {
+      if (d[i][j] == d[i][j + 1] && d[i][j] == d[i + 1][j] && d[i][j] == d[i + 1][j + 1]) x += 3;
+    }
+    for (i = 0; i < d.length; i++) {
+      k = d[i][0];
+      n = 1;
+      for (j = 1; j < d.length; j++) {
+        if (k != d[i][j]) {
+          k = d[i][j];
+          n = 1;
+        }
+        else {
+          n++;
+          if (n == 5) x += 3;
+          if (n > 5) x++;
+        }
+      }
+    }
+    for (i = 0; i < d.length; i++) {
+      k = d[0][i];
+      n = 1;
+      for (j = 1; j < d.length; j++) {
+        if (k != d[j][i]) {
+          k = d[j][i];
+          n = 1;
+        }
+        else {
+          n++;
+          if (n == 5) x += 3;
+          if (n > 5) x++;
+        }
+      }
+    }
+    for (i = 0; i < d.length; i++) for (j = 0; j < d.length - 6; j++) {
+      if (d[i][j] && !d[i][j + 1] && d[i][j + 2] && d[i][j + 3] && d[i][j + 4] && !d[i][j + 5] && d[i][j + 6]) {
+        for (k = 0; k < 4; k++) if (j - 1 - k >= 0 && d[i][j - 1 - k]) break;
+        if (k == 4 && (j + 7 >= d.length || !d[i][j + 7])) x += 40;
+        for (k = 0; k < 4; k++) if (j + 7 + k < d.length && d[i][j + 7 + k]) break;
+        if (k == 4 && (!j || !d[i][j - 1])) x += 40;
+      }
+      if (d[j][i] && !d[j + 1][i] && d[j + 2][i] && d[j + 3][i] && d[j + 4][i] && !d[j + 5][i] && d[j + 6][i]) {
+        for (k = 0; k < 4; k++) if (j - 1 - k >= 0 && d[j - 1 - k][i]) break;
+        if (k == 4 && (j + 7 >= d.length || !d[j + 7][i])) x += 40;
+        for (k = 0; k < 4; k++) if (j + 7 + k < d.length && d[j + 7 + k][i]) break;
+        if (k == 4 && (!j || !d[j - 1][i])) x += 40;
+      }
+    }
+    return x;
   }
   function _dots(v) {
     var i, d = [], sz = v * 4 + 17;
