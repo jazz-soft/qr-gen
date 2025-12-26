@@ -1,0 +1,29 @@
+var assert = require('assert');
+var QR = require('..');
+
+function text(qr) {
+  var i, j, s = '';
+  for (i = 0; i < qr.length; i += 2) {
+      for (j = 0; j < qr.length; j++) s += i + 1 < qr.length && qr[i + 1][j] ? qr[i][j] ? '█' : '▄' : qr[i][j] ? '▀' : ' ';
+      s += '\n';
+  }
+  return s;
+}
+
+describe('qr', function() {
+  it('short', function() {
+    assert.equal(text(QR('a')),`
+█▀▀▀▀▀█  █▄█▀ █▀▀▀▀▀█
+█ ███ █ ▀█ █▀ █ ███ █
+█ ▀▀▀ █   ▀ █ █ ▀▀▀ █
+▀▀▀▀▀▀▀ █▄▀▄█ ▀▀▀▀▀▀▀
+▀▀█ ██▀█▀▀█▀ ▀█   █▄ 
+▄▄ ▄▀▄▀▀▀██ ▀ ▄ ▀ ▄ ▀
+▀▀  ▀▀▀▀▄▄ ▄▀▄▀▄▀▄▀▄█
+█▀▀▀▀▀█ █▄▄█▄█▀█▄█▀▀▀
+█ ███ █ ▀ █▀ ▀█▀ ▀█▄▀
+█ ▀▀▀ █ ██  ▀ ▄ ▀ ▄▄▀
+▀▀▀▀▀▀▀ ▀▀  ▀ ▀ ▀ ▀▀▀
+`.substring(1));
+  });
+});
