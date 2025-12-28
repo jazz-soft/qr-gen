@@ -56,7 +56,7 @@ for (i = 0; i < qr.length; i += 2) {
 }
 console.log(s);
 ```
-This will produce the following output: (Sorry, it does not look impressive in the markdown document :))
+This will produce the following output:
 ```
 █▀▀▀▀▀█  ▄▀  ▄▀  ▀ █  █▀▀▀▀▀█
 █ ███ █ ▀▄ ▀▄▄ ▀  ▀▀█ █ ███ █
@@ -74,5 +74,6 @@ This will produce the following output: (Sorry, it does not look impressive in t
 █ ▀▀▀ █ █▄ ▀█▄█▄ █▄█▄▄ ▀█▀ ▄▀
 ▀▀▀▀▀▀▀ ▀▀▀▀  ▀  ▀ ▀▀▀ ▀▀  ▀▀
 ```
+Sorry, it doesn’t look very impressive in the Markdown document, but it works nevertheless! :)
 
 See more examples of generating SVG and Canvas images in this repository.
