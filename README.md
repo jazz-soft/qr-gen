@@ -41,7 +41,7 @@ const QR = require('qr-min');
 
 ## API
 
-`QR(...)` - the only function in this package.
+`QR(...)` - the only function in this package.  
 Takes a string and returns a 2-dimensional array of the dots in the QR code.  
 Use this data to produce an image in your own artistic style.
 
